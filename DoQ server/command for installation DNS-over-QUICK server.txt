@@ -1,0 +1,46 @@
+Install dependences
+	sudo apt install build-essential libpcre++-dev libssl-dev libgeoip-dev libxslt1-dev libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev
+	sudo apt install git cmake cargo curl software-properties-common
+
+Install last version of golang
+	sudo wget https://dl.google.com/go/go1.16.linux-amd64.tar.gz
+	sudo tar -xvf go1.16.linux-amd64.tar.gz
+	sudo mv go /usr/local
+	source ~/.profile
+	sudo nano ~/.profile
+		export GOROOT=/usr/local/go
+		export GOPATH=$HOME/go
+		export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+		
+	source ~/.profile
+	go version
+
+Create certificate:
+	mkdir ssl
+	cd ssl/
+	openssl req -newkey rsa:2048 -nodes -keyout serverdoq.key -x509 -days 365 -out serverdoq.cert
+
+Edit /etc/hosts:
+	127.0.0.1       ns1.example.com
+	
+Installation DNS-over-QUICK server:
+	git clone https://github.com/AdguardTeam/dnsproxy
+	cd dnsproxy/
+	go build -mod=vendor
+	./dnsproxy -l 127.0.0.1 --quic-port=784 --tls-crt=/PATH/TO/ssl/serverdoq.cert --tls-key=/PATH/TO/ssl/serverdoq.key -u 8.8.8.8:53 -p 0
+	
+How to test:
+	git clone https://github.com/ameshkov/dnslookup
+	cd dnslookup/
+    make build
+	Enable certificates verification:
+		./dnslookup lenta.ru quic://ns1.example.com
+	Disable certificates verification:
+		VERIFY=0 ./dnslookup lenta.ru quic://ns1.example.com
+
+
+
+
+
+
+
