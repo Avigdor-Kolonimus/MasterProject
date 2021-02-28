@@ -1,0 +1,42 @@
+Install dependences
+	sudo apt install build-essential libpcre++-dev libssl-dev libgeoip-dev libxslt1-dev libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev
+	sudo apt install git cmake cargo nginx curl software-properties-common
+
+Install last version of golang
+	sudo wget https://dl.google.com/go/go1.16.linux-amd64.tar.gz
+	sudo tar -xvf go1.16.linux-amd64.tar.gz
+	sudo mv go /usr/local
+	source ~/.profile
+	sudo nano ~/.profile
+		export GOROOT=/usr/local/go
+		export GOPATH=$HOME/go
+		export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+		
+	source ~/.profile
+	go version
+
+Create certificate:
+	mkdir ssl
+	cd ssl/
+	openssl req -nodes -new -x509 -keyout server.key -out server.cert
+	openssl x509 -in server.cert -out doh.local.pem -outform PEM
+	cat server.cert server.key > doh.local-key.pem
+
+Edit /etc/hosts:
+	127.0.0.1       ns1.example.com
+	
+Installation DNS-over-HTTPs server:
+	git clone https://github.com/m13253/dns-over-https.git
+	cd dns-over-https/
+	make
+	make install
+	nano  /etc/dns-over-https/doh-server.conf
+	
+Configure your browser
+Well in Firefox this is pretty easy.
+Search your preferences / settings in Firefox for DNS. Check "Enable DNS over HTTPS" and write https://ns1.example.com/dns-query.
+
+
+
+
+
